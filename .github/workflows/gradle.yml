@@ -14,9 +14,10 @@ env:
 
 jobs:
   build:
+  
     runs-on: ubuntu-latest
-    env:
-      working-directory: ./server/bf
+    # env:
+      # working-directory: ./server/bf
 
     steps:
     - uses: actions/checkout@v3
@@ -43,18 +44,18 @@ jobs:
        spring.security.oauth2.client.registration.google.clientId: ${{ secrets.GOOGLE_CLIENT_ID }}
        spring.security.oauth2.client.registration.google.clientSecret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
        
-    - name: init with Gradle
-      uses: gradle/gradle-build-action@v2
-    - run: gradle init
+   # - name: init with Gradle
+   #   uses: gradle/gradle-build-action@v2
+   # - run: gradle init
 
     - name: Grant execute permissions to gradlew script
-      run: chmod +x ./gradlew
+      run: chmod +x server/bf/gradlew
       
     - name: Build with Gradle
-      # uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      # with:
-      # arguments: build
-      run: ./gradlew build -x test -x asciidoctor
+      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+      with:
+       arguments: build
+       build-root-directory: server/bf
 
     
     # build한 후 프로젝트를 압축합니다.
