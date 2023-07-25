@@ -1,5 +1,6 @@
 package com.bobfriends.bf.mate.dto;
 
+import com.bobfriends.bf.member.entity.Member;
 import com.bobfriends.bf.post.entity.Post;
 import lombok.*;
 
@@ -43,6 +44,10 @@ public class MateMemberDto {
     public static class MateMemberGetResponse{
         private Long memberId;
         private String name;
+        private String image;
+        private Member.genderStatus gender;
+        private float avgStarRate;
+        private boolean eatStatus;
     }
     @Getter @Setter
     @NoArgsConstructor

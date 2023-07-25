@@ -6,7 +6,7 @@ import postLogin from '../util/api/postLogin.tsx';
 import { setCookie } from '../util/cookie/index.ts';
 import { login } from '../store/userSlice.ts';
 import moment from 'moment';
-// import GoogleLoginButton from '../components/Login/GoogleLoginButton.tsx';
+import { locationPost } from '../store/locationSlice.ts';
 
 const Login = () => {
   const [email, setEmail] = useState<string>('');
@@ -16,16 +16,6 @@ const Login = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  // const handleGoogleLogin = async () => {};
-  // 이렇게 useEffect쓰는게 나은지 아니면 async await썼으니까 충분한지??
-  // useEffect(() => {
-  //   // if (UserInfo.gender) {
-  //   navigate('/');
-  // } else {
-  //   navigate(`/users/userInfo/${responseData.memberId}`);
-  // }
-  // }, [UserInfo]);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -49,12 +39,9 @@ const Login = () => {
     if (loginFormValid) {
       try {
         const response = await postLogin(email, password);
-        // const { accessToken } = responseData;
-        // axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
         setCookie('accessToken', response.headers.authorization);
         setCookie('refreshToken', response.headers.refresh);
-        // console.log(response.headers.refresh);
 
         localStorage.setItem('expiredAt', moment().add(1, 'hour').format('yyyy-MM-DD HH:mm:ss'));
 
@@ -69,8 +56,14 @@ const Login = () => {
           })
         );
 
+        if (responseData.locationId && responseData.location) {
+          const locationURI = `/users/mypage/${responseData.memberId}/location/${responseData.locationId}`;
+          dispatch(locationPost({ locationId: locationURI, address: responseData.location }));
+        }
+
         if (responseData.gender && responseData.location) {
           navigate('/');
+          window.location.reload();
         } else {
           navigate(`/users/userInfo/${responseData.memberId}`);
         }
@@ -105,17 +98,17 @@ const Login = () => {
           처음이신가요? <a href="/users/signup">회원가입</a>으로 가기
         </div>
       </SignUpTextContainer>
-      <OAuthButtonContainer>
-        {/* <OAuthButtonSection
+      {/* <OAuthButtonContainer> */}
+      {/* <OAuthButtonSection
           href={`${import.meta.env.VITE_APP_API_URL}/oauth2/authorization/google`}
           onClick={handleGoogleLogin}
         >
           google
         </OAuthButtonSection> */}
-        {/* <GoogleLoginButton></GoogleLoginButton> */}
-        <OAuthButtonSection>Kakao</OAuthButtonSection>
+      {/* <GoogleLoginButton></GoogleLoginButton> */}
+      {/* <OAuthButtonSection>Kakao</OAuthButtonSection>
         <OAuthButtonSection>Naver</OAuthButtonSection>
-      </OAuthButtonContainer>
+      </OAuthButtonContainer> */}
     </LoginContainer>
   );
 };
@@ -170,15 +163,15 @@ const SignUpTextContainer = styled.section`
   }
 `;
 
-const OAuthButtonContainer = styled.article`
-  display: flex;
-  flex-direction: column;
-  > button:nth-child(2) {
-    margin: 10px 0;
-  }
-`;
-const OAuthButtonSection = styled.button`
-  height: 40px;
-  background-color: var(--color-gray);
-  border-color: black;
-`;
+// const OAuthButtonContainer = styled.article`
+//   display: flex;
+//   flex-direction: column;
+//   > button:nth-child(2) {
+//     margin: 10px 0;
+//   }
+// `;
+// const OAuthButtonSection = styled.button`
+//   height: 40px;
+//   background-color: var(--color-gray);
+//   border-color: black;
+// `;

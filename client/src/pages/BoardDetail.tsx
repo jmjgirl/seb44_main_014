@@ -24,6 +24,7 @@ const BoardDetail = () => {
   const params = useParams();
   const postId = Number(params.postId);
   const userId = useSelector((state: IUserState) => state.user.memberId);
+  const isLoggedIn = useSelector((state: IUserState) => state.user.isLogin);
 
   const [detailData, setDetailData] = useState<IBoardDetailData>({
     title: '',
@@ -72,7 +73,6 @@ const BoardDetail = () => {
     axios
       .get(`${import.meta.env.VITE_APP_API_URL}/board/posts/${postId}`)
       .then((res) => {
-        console.log(res.data);
         const { mate } = res.data;
         setDetailData(res.data);
         setUpdateMate({ mate });
@@ -88,7 +88,6 @@ const BoardDetail = () => {
     axios
       .get(`${import.meta.env.VITE_APP_API_URL}/posts/${postId}/mate`)
       .then((res) => {
-        console.log(res.data);
         const { mate_member } = res.data;
         setMateData(mate_member);
       })
@@ -102,30 +101,32 @@ const BoardDetail = () => {
   };
 
   const postApplyData = async () => {
-    (await authApi)
-      .post(`/board/posts/${postId}/mate`, applyData)
-      .then((res) => {
-        setUpdateMate({ ...updateMate, mate: { findNum: res.data.findNum, mateNum: res.data.mateNum } });
-        getMateData();
-      })
-      .catch((err) => {
-        console.log(err);
-        if (err.response.status === 409) {
-          alert('이미 참여 신청한 모임입니다.');
-        } else if (err.response.status === 403) {
-          alert('신청 불가한 모임입니다.');
-        } else if (err.response.status === 500) {
-          alert('로그인 후 신청해주세요.');
-          navigate('/login');
-        }
-      });
+    if (detailData.status !== 'END') {
+      (await authApi)
+        .post(`/board/posts/${postId}/mate`, applyData)
+        .then((res) => {
+          setUpdateMate({ ...updateMate, mate: { findNum: res.data.findNum, mateNum: res.data.mateNum } });
+          getMateData();
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.response.status === 409) {
+            alert('이미 참여 신청한 모임입니다.');
+          } else if (err.response.status === 403) {
+            alert('신청 불가한 모임입니다.');
+          } else if (!isLoggedIn) {
+            alert('로그인 후 신청해주세요.');
+          }
+        });
+    } else {
+      alert('모집 종료된 게시물입니다.');
+    }
   };
 
   const deletePost = async () => {
     (await authApi)
       .delete(`/board/posts/${postId}`)
-      .then((res) => {
-        console.log(res);
+      .then(() => {
         navigate('/board');
       })
       .catch((err) => {
