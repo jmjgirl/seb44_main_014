@@ -3,13 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from 'styled-components';
 
+import api from '../util/api/api.tsx';
 import BoardList from './Board/BoardList.tsx';
-import Loading from './Loading.tsx';
 import NoBoardList from './Board/NoBoardList.tsx';
-import { IBoardList } from '../interface/board.ts';
+import MainListArea from './MainListArea.tsx';
+
 import { category } from '../store/listCategorySlice.ts';
+import { IBoardList } from '../interface/board.ts';
 import { ILocationState } from '../store/locationSlice.ts';
-import authApi from '../util/api/authApi.tsx';
+import { IUserState } from '../store/userSlice.ts';
+import { FOOD_TAGS } from '../constant/constant.ts';
 
 const AfterLogin = () => {
   const navigate = useNavigate();
@@ -17,10 +20,20 @@ const AfterLogin = () => {
   const [lists, setLists] = useState<IBoardList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const address = useSelector((state: ILocationState) => state.location.address);
+  const foodTag = useSelector((state: IUserState) => state.user.foodTagId);
+
+  let userFoodTag: number;
+  if (!foodTag) {
+    userFoodTag = 1;
+  } else {
+    userFoodTag = foodTag;
+  }
+
+  const customTagListTitle = FOOD_TAGS.filter((tag) => tag.id === userFoodTag)[0].text;
 
   useEffect(() => {
     const getBoarList = async () => {
-      (await authApi)
+      (await api())
         .get(`/home`)
         .then((res) => {
           setLists(res.data);
@@ -34,96 +47,67 @@ const AfterLogin = () => {
     getBoarList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleMoreCustomList = () => {
+    navigate('/board');
+  };
+
+  const handleMoreEatingList = () => {
+    navigate('/board');
+    dispatch(category('EATING'));
+  };
+
+  const handleMoreShoppingList = () => {
+    navigate('/board');
+    dispatch(category('SHOPPING'));
+  };
+
   return (
     <>
-      <LocationText>{address}</LocationText>
+      <LocationText>
+        <p>{address}</p>
+      </LocationText>
       <BannerSection>
-        <BannerTitle>
-          회원가입 후 게시글이 안 보이신다면 새로고침을 해주세요!
-          <br />
-          현재 해결 중에 있는 부분입니다..🥹
-        </BannerTitle>
-        {/* <BannerTitle>밥친구</BannerTitle> */}
+        <BannerTitle>밥친구</BannerTitle>
       </BannerSection>
       <ListSection>
-        <ListBlock>
-          <TitleArea>
-            <TitleH3>밥 먹기 최신 글</TitleH3>
-            <MoreButton
-              onClick={() => {
-                navigate('/board');
-                dispatch(category('EATING'));
-              }}
-            >
-              더 보기
-            </MoreButton>
-          </TitleArea>
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <ul>
-              {lists.filter((list) => list.category === 'EATING').length === 0 && <NoBoardList />}
-              {lists
-                .filter((list) => list.category === 'EATING')
-                .slice(0, 4)
-                .map((list, idx) => (
-                  <BoardList key={idx} list={list} />
-                ))}
-            </ul>
-          )}
-        </ListBlock>
-        <ListBlock>
-          <TitleArea>
-            <TitleH3>장 보기 최신 글</TitleH3>
-            <MoreButton
-              onClick={() => {
-                navigate('/board');
-                dispatch(category('SHOPPING'));
-              }}
-            >
-              더 보기
-            </MoreButton>
-          </TitleArea>
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <ul>
-              {lists.filter((list) => list.category === 'SHOPPING').length === 0 && <NoBoardList />}
-              {lists
-                .filter((list) => list.category === 'SHOPPING')
-                .slice(0, 4)
-                .map((list, idx) => (
-                  <BoardList key={idx} list={list} />
-                ))}
-            </ul>
-          )}
-        </ListBlock>
-        <ListBlock>
-          <TitleArea>
-            <TitleH3># 한식 최신 글</TitleH3>
-            <MoreButton
-              onClick={() => {
-                navigate('/board');
-                // dispatch(category('SHOPPING'));
-              }}
-            >
-              더 보기
-            </MoreButton>
-          </TitleArea>
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <ul>
-              {lists.filter((list) => list.postTag.foodTagId === 1).length === 0 && <NoBoardList />}
-              {lists
-                .filter((list) => list.postTag.foodTagId === 1)
-                .slice(0, 4)
-                .map((list, idx) => (
-                  <BoardList key={idx} list={list} />
-                ))}
-            </ul>
-          )}
-        </ListBlock>
+        <MainListArea
+          title={`사용자 맞춤 게시글: ${customTagListTitle}`}
+          moreBtnHandler={handleMoreCustomList}
+          isLoading={isLoading}
+        >
+          <ul>
+            {lists.filter((list) => list.postTag.foodTagId === userFoodTag).length === 0 && <NoBoardList />}
+            {lists
+              .filter((list) => list.postTag.foodTagId === userFoodTag)
+              .slice(0, 4)
+              .map((list, idx) => (
+                <BoardList key={idx} list={list} />
+              ))}
+          </ul>
+        </MainListArea>
+        <MainListArea title={'밥 먹기 최신 글'} moreBtnHandler={handleMoreEatingList} isLoading={isLoading}>
+          <ul>
+            {lists.filter((list) => list.category === 'EATING').length === 0 && <NoBoardList />}
+            {lists
+              .filter((list) => list.category === 'EATING')
+              .slice(0, 4)
+              .map((list, idx) => (
+                <BoardList key={idx} list={list} />
+              ))}
+          </ul>
+        </MainListArea>
+        <MainListArea title={'장 보기 최신 글'} moreBtnHandler={handleMoreShoppingList} isLoading={isLoading}>
+          <ul>
+            {lists.filter((list) => list.category === 'SHOPPING').length === 0 && <NoBoardList />}
+            {lists
+              .filter((list) => list.category === 'SHOPPING')
+              .slice(0, 4)
+              .map((list, idx) => (
+                <BoardList key={idx} list={list} />
+              ))}
+          </ul>
+        </MainListArea>
       </ListSection>
     </>
   );
@@ -154,22 +138,26 @@ const LocationText = styled.div`
   left: 0;
   top: 50px;
   width: 100%;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  padding-left: 30px;
+  padding: 0.5rem 0;
   background-color: rgba(0, 0, 0, 0.5);
-  color: #ffffff;
-  font-family: 'NanumSquare', sans-serif;
-  font-size: 0.875rem;
-  @media screen and (min-width: 768px) {
-    padding-left: 80px;
-  }
   @media screen and (min-width: 1024px) {
     top: 70px;
-    padding-top: 0.8rem;
-    padding-bottom: 0.8rem;
-    padding-left: 50px;
-    font-size: 1rem;
+    padding: 0.8rem 0;
+  }
+  p {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 30px;
+    color: #ffffff;
+    font-family: 'NanumSquare', sans-serif;
+    font-size: 0.875rem;
+    @media screen and (min-width: 768px) {
+      padding: 0 80px;
+    }
+    @media screen and (min-width: 1024px) {
+      padding: 0 50px;
+      font-size: 1rem;
+    }
   }
 `;
 
@@ -193,46 +181,6 @@ const ListSection = styled.ul`
   }
   @media screen and (min-width: 1024px) {
     padding: 0 3.125rem 5rem;
-  }
-`;
-
-const ListBlock = styled.li`
-  margin-top: 3rem;
-  @media screen and (min-width: 1024px) {
-    margin-top: 5rem;
-  }
-`;
-
-const TitleArea = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.25rem;
-  @media screen and (min-width: 768px) {
-    margin-bottom: 1.875rem;
-  }
-  @media screen and (min-width: 1024px) {
-  }
-`;
-
-const TitleH3 = styled.h3`
-  padding-left: 1rem;
-  font-family: 'NanumSquare', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  @media screen and (min-width: 768px) {
-  }
-  @media screen and (min-width: 1024px) {
-    font-size: 1.5rem;
-  }
-`;
-
-const MoreButton = styled.button`
-  padding-right: 1rem;
-  font-size: 13px;
-  @media screen and (min-width: 768px) {
-  }
-  @media screen and (min-width: 1024px) {
   }
 `;
 

@@ -11,15 +11,10 @@ import BoardComment from '../components/Board/BoardDetail/BoardComment.tsx';
 import Loading from '../components/Loading.tsx';
 import AlertPopup from '../components/UI/AlertPopup.tsx';
 
-import authApi from '../util/api/authApi.tsx';
-import { IBoardDetailData } from '../interface/board.ts';
+import api from '../util/api/api.tsx';
+import { IBoardDetailData, IParticipants } from '../interface/board.ts';
 import { IUserState } from '../store/userSlice.ts';
 import { showModal } from '../util/common.ts';
-
-interface IMember {
-  memberId: number;
-  name: string;
-}
 
 const BoardDetail = () => {
   const navigate = useNavigate();
@@ -61,7 +56,7 @@ const BoardDetail = () => {
 
   const { content, member, comments } = detailData;
   const [updateMate, setUpdateMate] = useState({ mate: { findNum: 0, mateNum: 0 } });
-  const [mateData, setMateData] = useState<IMember[] | []>([]);
+  const [mateData, setMateData] = useState<IParticipants[] | []>([]);
   const [boardDeleteAlert, setBoardDeleteAlert] = useState<boolean>(false);
 
   const showParticipant = mateData.filter((mate) => mate.memberId === userId).length;
@@ -105,7 +100,7 @@ const BoardDetail = () => {
 
   const postApplyData = async () => {
     if (detailData.status !== 'END') {
-      (await authApi)
+      (await api())
         .post(`/board/posts/${postId}/mate`, applyData)
         .then((res) => {
           setUpdateMate({ ...updateMate, mate: { findNum: res.data.findNum, mateNum: res.data.mateNum } });
@@ -127,7 +122,7 @@ const BoardDetail = () => {
   };
 
   const deletePost = async () => {
-    (await authApi)
+    (await api())
       .delete(`/board/posts/${postId}`)
       .then(() => {
         navigate('/board');
@@ -194,12 +189,12 @@ const DetailContainer = styled.section`
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 1.875rem;
+  padding: 30px 30px 100px;
   @media screen and (min-width: 768px) {
-    padding: 40px 80px;
+    padding: 40px 80px 100px;
   }
   @media screen and (min-width: 1024px) {
-    padding: 50px;
+    padding: 50px 50px 100px;
   }
 `;
 

@@ -6,9 +6,8 @@ import TagCheckbox from '../components/UI/TagCheckbox.tsx';
 import Button from '../components/UI/Button.tsx';
 import { checkedValue, selectOneCheckbox } from '../util/common.ts';
 import { IUserState } from '../store/userSlice.ts';
-import axios from 'axios';
 import { ILocationState } from '../store/locationSlice.ts';
-import authApi from '../util/api/authApi.tsx';
+import api from '../util/api/api.tsx';
 
 const EditUserInfo = () => {
   const [userData, setUserData] = useState({
@@ -33,10 +32,9 @@ const EditUserInfo = () => {
   }, []);
 
   const getData = async () => {
-    (await authApi)
+    (await api())
       .get(`/users/mypage/${userId}`)
       .then((res) => {
-        console.log(res.data);
         setUserData(res.data);
         UserGender(res.data);
         setUserImg(res.data.image);
@@ -47,7 +45,7 @@ const EditUserInfo = () => {
   };
 
   const patchData = async () => {
-    (await authApi)
+    (await api())
       .patch(`/users/mypage/${userId}/edit`, {
         image: userImg,
         foodTag: {
@@ -63,7 +61,6 @@ const EditUserInfo = () => {
     selectOneCheckbox(e);
     const foodTag = checkedValue(e);
     setUserFoodTag(parseInt(foodTag, 10));
-    console.log(userFoodTag);
   };
 
   const UserGender = (data: any) => {
@@ -82,15 +79,12 @@ const EditUserInfo = () => {
     const formData = new FormData();
     formData.append('multipartFile', selectedImage);
 
-    const imageResponseUrl = await axios
-      .post(`${import.meta.env.VITE_APP_API_URL}/users/images/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true,
-      })
-      .then((res) => res.data[0]);
-    setUserImg(imageResponseUrl);
+    // const imageResponseUrl = (await api())
+    //   .patch(`${import.meta.env.VITE_APP_API_URL}/users/images/upload`, formData, {
+    //     withCredentials: true,
+    //   })
+    //   .then((res) => res.data[0]);
+    // setUserImg(imageResponseUrl);
   };
   return (
     <MainContainer>
@@ -137,10 +131,10 @@ const EditUserInfo = () => {
             # 중식
           </TagCheckbox>
           <TagCheckbox type="food" value={3} handleGetValue={handleFoodTag}>
-            # 일식
+            # 양식
           </TagCheckbox>
           <TagCheckbox type="food" value={4} handleGetValue={handleFoodTag}>
-            # 양식
+            # 일식
           </TagCheckbox>
           <TagCheckbox type="food" value={5} handleGetValue={handleFoodTag}>
             # 기타
