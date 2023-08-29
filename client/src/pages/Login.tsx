@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import postLogin from '../util/api/postLogin.tsx';
-import { setCookie } from '../util/cookie/index.ts';
+// import { setCookie } from '../util/cookie/index.ts';
 import { login } from '../store/userSlice.ts';
 import moment from 'moment';
 import { locationPost } from '../store/locationSlice.ts';
@@ -40,10 +40,13 @@ const Login = () => {
       try {
         const response = await postLogin(email, password);
 
-        setCookie('accessToken', response.headers.authorization);
-        setCookie('refreshToken', response.headers.refresh);
+        // setCookie('accessToken', response.headers.authorization);
+        // setCookie('refreshToken', response.headers.refresh);
 
-        localStorage.setItem('expiredAt', moment().add(0.015, 'hour').format('yyyy-MM-DD HH:mm:ss'));
+        localStorage.setItem('login-token', response.headers.authorization);
+        localStorage.setItem('login-refresh', response.headers.refresh);
+
+        localStorage.setItem('expiredAt', moment().add(1, 'hour').format('yyyy-MM-DD HH:mm:ss'));
 
         const responseData = response.data;
         alert('로그인에 성공했습니다.');

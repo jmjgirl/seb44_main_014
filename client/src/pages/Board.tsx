@@ -15,7 +15,8 @@ import NoBoardList from '../components/Board/NoBoardList.tsx';
 import { category, ICategoryState } from '../store/listCategorySlice.ts';
 import { IUserState } from '../store/userSlice.ts';
 import { IBoardList, IFilterInfo, IPageInfo } from '../interface/board.ts';
-import api from '../util/api/api.tsx';
+// import api from '../util/api/api.tsx';
+import instance from '../util/api/instance.ts';
 
 const Board = () => {
   const navigate = useNavigate();
@@ -54,11 +55,13 @@ const Board = () => {
 
   useEffect(() => {
     const getBoardList = async () => {
-      (await api())
+      await instance
         .get(`/board/search?page=${filterInfo.page}${currentApi}`)
         .then((res) => {
           setPageInfo(res.data.pageInfo);
           setLists(res.data.data);
+          setNewer(true);
+          setMostViewed(false);
           setIsLoading(false);
         })
         .catch((err) => {
@@ -74,6 +77,8 @@ const Board = () => {
         .then((res) => {
           setPageInfo(res.data.pageInfo);
           setLists(res.data.data);
+          setNewer(true);
+          setMostViewed(false);
           setIsLoading(false);
         })
         .catch((err) => {
