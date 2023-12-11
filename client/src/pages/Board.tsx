@@ -15,7 +15,6 @@ import NoBoardList from '../components/Board/NoBoardList.tsx';
 import { category, ICategoryState } from '../store/listCategorySlice.ts';
 import { IUserState } from '../store/userSlice.ts';
 import { IBoardList, IFilterInfo, IPageInfo } from '../interface/board.ts';
-// import api from '../util/api/api.tsx';
 import instance from '../util/api/instance.ts';
 
 const Board = () => {
@@ -55,36 +54,37 @@ const Board = () => {
 
   useEffect(() => {
     const getBoardList = async () => {
-      await instance
-        .get(`/board/search?page=${filterInfo.page}${currentApi}`)
-        .then((res) => {
-          setPageInfo(res.data.pageInfo);
-          setLists(res.data.data);
-          setNewer(true);
-          setMostViewed(false);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setIsLoading(false);
-        });
+      try {
+        const res = await instance.get(`/board/search?page=${filterInfo.page}${currentApi}`);
+        setPageInfo(res.data.pageInfo);
+        setLists(res.data.data);
+        setNewer(true);
+        setMostViewed(false);
+        setIsLoading(false);
+      } catch (err) {
+        console.log(err);
+        setIsLoading(false);
+      }
+    };
+    const getNonUserBoardList = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_APP_API_URL}/board/search/notlogin?page=${filterInfo.page}${currentApi}`
+        );
+        setPageInfo(res.data.pageInfo);
+        setLists(res.data.data);
+        setNewer(true);
+        setMostViewed(false);
+        setIsLoading(false);
+      } catch (err) {
+        console.log(err);
+        setIsLoading(false);
+      }
     };
     if (isLoggedIn) {
       getBoardList();
     } else {
-      axios
-        .get(`${import.meta.env.VITE_APP_API_URL}/board/search/notlogin?page=${filterInfo.page}${currentApi}`)
-        .then((res) => {
-          setPageInfo(res.data.pageInfo);
-          setLists(res.data.data);
-          setNewer(true);
-          setMostViewed(false);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setIsLoading(false);
-        });
+      getNonUserBoardList();
     }
   }, [isLoggedIn, filterInfo, currentApi]);
 

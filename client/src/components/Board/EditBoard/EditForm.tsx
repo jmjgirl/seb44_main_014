@@ -9,7 +9,6 @@ import TagCheckbox from '../../UI/TagCheckbox.tsx';
 import Loading from '../../Loading.tsx';
 
 import instance from '../../../util/api/instance.ts';
-// import api from '../../../util/api/api.tsx';
 import { GENDER_TAGS, FOOD_TAGS } from '../../../constant/constant.ts';
 import { IEditInfo } from '../../../interface/board.ts';
 import { checkedValue, selectOneCheckbox } from '../../../util/common.ts';
@@ -34,9 +33,9 @@ const EditForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_APP_API_URL}/board/posts/${postId}`)
-      .then((res) => {
+    const getFormInfo = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_APP_API_URL}/board/posts/${postId}`);
         const { category, content, mate, postTag, status, title, member } = res.data;
         const data = {
           category,
@@ -53,11 +52,12 @@ const EditForm = () => {
         }
         setInfo(data);
         setIsLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.log(err);
         setIsLoading(false);
-      });
+      }
+    };
+    getFormInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -89,18 +89,16 @@ const EditForm = () => {
   }, [info]);
 
   const patchSubmitInfo = async () => {
-    await instance
-      .patch(`/board/posts/${postId}/edit`, info)
-      .then(() => {
-        if (info.status === 'END' && !isDisabled) {
-          navigate(`/board/post/${postId}/mate`);
-        } else {
-          navigate(`/board/posts/${postId}`);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      const res = await instance.patch(`/board/posts/${postId}/edit`, info);
+      if (info.status === 'END' && !isDisabled) {
+        navigate(`/board/post/${postId}/mate`);
+      } else {
+        navigate(`/board/posts/${postId}`);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleCategoryType = (e: React.MouseEvent<HTMLInputElement>) => {
@@ -188,6 +186,7 @@ const EditForm = () => {
           ))}
         </TagFlex>
       </InfoDiv>
+      {/* 장보기 선택 시, 음식 태그 선택 비노출 */}
       {info.category !== 'SHOPPING' && (
         <InfoDiv>
           <InfoTitle>음식 태그</InfoTitle>
@@ -214,6 +213,7 @@ const EditForm = () => {
           />
         </div>
       </InfoDiv>
+      {/* 모집 종료 처리된 모임의 경우 모집 상태 비노출 */}
       {!isDisabled && (
         <InfoDiv>
           <InfoTitle>모집 상태 *</InfoTitle>

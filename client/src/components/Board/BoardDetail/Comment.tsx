@@ -7,10 +7,10 @@ import { faStar } from '@fortawesome/free-solid-svg-icons';
 
 import AlertPopup from '../../UI/AlertPopup.tsx';
 import ProfilePopup from './ProfilePopup.tsx';
+
 import { IComments } from '../../../interface/board.ts';
 import { timeStamp, showModal } from '../../../util/common.ts';
 import { IUserState } from '../../../store/userSlice.ts';
-// import api from '../../../util/api/api.tsx';
 import instance from '../../../util/api/instance.ts';
 
 type CommentInfoProps = {
@@ -34,25 +34,21 @@ const Comment = ({ commentInfo }: CommentInfoProps) => {
   const newTime = timeStamp(new Date(createdAt));
 
   const patchComment = async () => {
-    await instance
-      .patch(`/board/posts/${postId}/comments/${commentId}`, commentContent)
-      .then((res) => {
-        setCommentContent({ ...commentContent, content: res.data.content });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      const res = await instance.patch(`/board/posts/${postId}/comments/${commentId}`, commentContent);
+      setCommentContent({ ...commentContent, content: res.data.content });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const deleteComment = async () => {
-    await instance
-      .delete(`/board/posts/${postId}/comments/${commentId}`)
-      .then(() => {
-        location.reload();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      const res = await instance.delete(`/board/posts/${postId}/comments/${commentId}`);
+      location.reload();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -144,6 +140,7 @@ const WriterInfo = styled.div`
 
 const WriterId = styled.span`
   color: var(--color-black);
+  cursor: pointer;
 `;
 
 const WriterScore = styled.span`
