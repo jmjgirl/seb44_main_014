@@ -47,7 +47,7 @@
 
 ## 📑 관련 문서
 
-#### [📌 API 명세서](https://pollen-rest-2b9.notion.site/API-7f5e6e055dfd4f21a677d6cdb427c035?pvs=4)
+#### [📌 API 명세서](https://pollen-rest-2b9.notion.site/API-d558ad3f9a87478fbff2c72b119494ea?pvs=4)
 
 #### [📌 ERD](https://www.erdcloud.com/d/MpCjoYMXYCtLuG3be)
 
