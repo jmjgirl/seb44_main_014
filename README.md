@@ -47,6 +47,12 @@
 
 ## 📑 관련 문서
 
+#### [📌 API 명세서](https://pollen-rest-2b9.notion.site/API-7f5e6e055dfd4f21a677d6cdb427c035?pvs=4)
+
+#### [📌 ERD](https://www.erdcloud.com/d/MpCjoYMXYCtLuG3be)
+
+![밥친구](https://github.com/codestates-seb/seb44_main_014/assets/124814766/4a278507-2c7e-4b7e-87d8-1f2373a3f2dd)
+
 #### [📌 와이어 프레임](https://www.figma.com/file/Xg0rcxVl4EVjOl4N8R35xA?embed_host=notion&kind=&mode=design&node-id=0-1&t=4HIC9eI5BP0URVAb-0&type=design&viewer=1)
 
 #### [📌 디자인](https://www.figma.com/file/Xg0rcxVl4EVjOl4N8R35xA?embed_host=notion&kind=&mode=design&node-id=44-216&t=4HIC9eI5BP0URVAb-0&type=design&viewer=1)
@@ -54,11 +60,6 @@
 #### [📌 유저플로우](https://www.figma.com/file/Xg0rcxVl4EVjOl4N8R35xA?embed_host=notion&kind=&mode=design&node-id=43-32&t=4HIC9eI5BP0URVAb-0&type=design&viewer=1)
 
 ![유저플로우](https://github.com/codestates-seb/seb44_main_014/assets/124814766/894c7cbf-ee77-4cd0-8b27-a53263397c6a)
-
-#### [📌 ERD](https://www.erdcloud.com/d/MpCjoYMXYCtLuG3be)
-
-![밥친구](https://github.com/codestates-seb/seb44_main_014/assets/124814766/4a278507-2c7e-4b7e-87d8-1f2373a3f2dd)
-
 
 <br>
 
